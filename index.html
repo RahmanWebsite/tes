@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANDA TERKUNCI</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000;
+            color: #ff0000;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: none; /* Sembunyikan kursor sialan itu */
+        }
+        h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 5px #ff0000;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.2em;
+        }
+        input[type="password"] {
+            padding: 10px;
+            font-size: 1.2em;
+            border: 2px solid #ff0000;
+            background-color: #111;
+            color: #ff0000;
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1.2em;
+            margin-top: 15px;
+            cursor: pointer;
+            background-color: #ff0000;
+            color: #000;
+            border: none;
+            font-weight: bold;
+        }
+        #error-message {
+            color: #ff0000;
+            margin-top: 15px;
+            visibility: hidden; /* Sembunyikan pesan kesalahan pada awalnya */
+        }
+    </style>
+</head>
+<body>
+
+<div id="lock-screen">
+    <h1>PONSEL ANDA TELAH DIKUNCI</h1>
+    <p>Masukkan kata sandi untuk membuka kunci.</p>
+    <input type="password" id="password-input" placeholder="Password...">
+    <br>
+    <button onclick="checkPassword()">BUKA KUNCI</button>
+    <p id="error-message">SANDI SALAH, COBA LAGI KEPARAT!</p>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('password-input');
+    const errorMessage = document.getElementById('error-message');
+    const correctPassword = "rahman135";
+
+    // Fungsi untuk meminta fullscreen
+    function requestFullScreen(element) {
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) { // Firefox
+            element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) { // IE/Edge
+            element.msRequestFullscreen();
+        }
+    }
+
+    // Fungsi untuk keluar dari fullscreen
+    function exitFullScreen() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+
+    // Paksa masuk ke mode fullscreen saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', (event) => {
+        requestFullScreen(document.documentElement);
+    });
+
+    // Coba masuk kembali ke fullscreen jika pengguna berhasil keluar
+    document.addEventListener('fullscreenchange', (event) => {
+        if (!document.fullscreenElement) {
+            requestFullScreen(document.documentElement);
+        }
+    });
+
+    // Fungsi untuk memeriksa kata sandi
+    function checkPassword() {
+        if (passwordInput.value === correctPassword) {
+            // Sembunyikan layar kunci sebelum keluar dari fullscreen
+            document.getElementById('lock-screen').style.display = 'none';
+            exitFullScreen();
+        } else {
+            // Tampilkan pesan kesalahan dan reset input
+            errorMessage.style.visibility = 'visible';
+            passwordInput.value = "";
+            // Sembunyikan pesan setelah beberapa detik
+            setTimeout(() => {
+                errorMessage.style.visibility = 'hidden';
+            }, 3000);
+        }
+    }
+
+    // Biarkan pengguna memasukkan sandi dengan tombol Enter
+    passwordInput.addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            checkPassword();
+        }
+    });
+
+</script>
+
+</body>
+</html>
